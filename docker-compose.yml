@@ -1,0 +1,29 @@
+version: '3.8'
+
+services:
+  config-server:
+    build: .
+    container_name: gm-config-server
+    ports:
+      - "9001:9001"
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+      - ENCRYPT_KEY=${ENCRYPT_KEY:-45D81EC1EF61DF9AD8D3E5BB397F9}
+      - GIT_URI=${GIT_URI:-https://github.com/sachin125/gavayam-config.git}
+      - GIT_DEFAULT_LABEL=${GIT_DEFAULT_LABEL:-main}
+      - EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE=${EUREKA_URL:-http://localhost:9002/eureka}
+    volumes:
+      - ./logs:/app/logs
+    networks:
+      - gavayam-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:9001/gconfigserver/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+networks:
+  gavayam-network:
+    driver: bridge 

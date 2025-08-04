@@ -1,1 +1,3 @@
-/media/ehd/project/gavayam/gavayam-configserver/src/main/java/com/gavayam/gconfigserver/GmConfigServerApplication.java
+/media/ehd/project/gavayam/gm-configserver/src/main/java/com/gavayam/gconfigserver/GmConfigServerApplication.java
+/media/ehd/project/gavayam/gm-configserver/src/main/java/com/gavayam/gconfigserver/config/SecurityConfig.java
+/media/ehd/project/gavayam/gm-configserver/src/main/java/com/gavayam/gconfigserver/health/ConfigServerHealthIndicator.java

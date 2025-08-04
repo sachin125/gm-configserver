@@ -1,0 +1,30 @@
+server:
+  port: 0  # Random port for testing
+
+spring:
+  main:
+    banner-mode: off
+  application:
+    name: gm-config-service-test
+  profiles:
+    active: native
+  cloud:
+    config:
+      server:
+        native:
+          search-locations: "classpath:/config"
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    health:
+      show-details: always
+
+logging:
+  level:
+    root: warn
+    com.gavayam: debug
+    org.springframework.cloud.config: debug 

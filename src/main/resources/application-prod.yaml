@@ -1,0 +1,126 @@
+server:
+  port: 9001
+  servlet:
+    context-path: /gconfigserver
+  compression:
+    enabled: true
+    mime-types: text/html,text/xml,text/plain,text/css,text/javascript,application/javascript,application/json
+    min-response-size: 1024
+
+spring:
+  main:
+    banner-mode: off
+  application:
+    name: gm-config-service
+  profiles:
+    active: git
+  cloud:
+    config:
+      server:
+        git:
+          uri: ${GIT_URI:https://github.com/sachin125/gavayam-config.git}
+          default-label: ${GIT_DEFAULT_LABEL:main}
+          timeout: 10
+          clone-on-start: true
+          force-pull: true
+          search-paths: config
+          deleteUntrackedBranches: true
+          refresh-rate: 0
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "health,info,metrics,prometheus"
+      base-path: /actuator
+  endpoint:
+    health:
+      probes:
+        enabled: true
+      show-details: when-authorized
+    metrics:
+      enabled: true
+  metrics:
+    tags:
+      application: ${spring.application.name}
+      environment: production
+    export:
+      prometheus:
+        enabled: true
+  health:
+    readiness-state:
+      enabled: true
+    liveness-state:
+      enabled: true
+
+# Security configuration
+security:
+  basic:
+    enabled: true
+  user:
+    name: ${CONFIG_USER:configuser}
+    password: ${CONFIG_PASSWORD:config123}
+  admin:
+    name: ${ADMIN_USER:admin}
+    password: ${ADMIN_PASSWORD:admin123}
+
+# Encryption
+encrypt:
+  key: ${ENCRYPT_KEY:45D81EC1EF61DF9AD8D3E5BB397F9}
+
+# Eureka configuration
+eureka:
+  instance:
+    prefer-ip-address: true
+    health-check-url-path: /gconfigserver/actuator/health
+    status-page-url-path: /gconfigserver/actuator/info
+  client:
+    fetch-registry: true
+    register-with-eureka: true
+    service-url:
+      defaultZone: ${EUREKA_URL:http://localhost:9002/eureka}
+
+# Logging configuration for production
+logging:
+  file:
+    name: /app/logs/${spring.application.name}.log
+    path: /app/logs
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
+  level:
+    root: warn
+    org.springframework.cloud.config: info
+    org.springframework.security: warn
+    com.gavayam: info
+  logback:
+    rollingpolicy:
+      file-name-pattern: /app/logs/${spring.application.name}-%d{yyyy-MM-dd}.%i.log
+      max-file-size: 10MB
+      total-size-cap: 100MB
+      max-history: 30
+
+# Resilience4j configuration
+resilience4j:
+  circuitbreaker:
+    instances:
+      gitOperations:
+        sliding-window-size: 10
+        failure-rate-threshold: 50
+        wait-duration-in-open-state: 30s
+        permitted-number-of-calls-in-half-open-state: 3
+  retry:
+    instances:
+      gitRetry:
+        max-attempts: 3
+        wait-duration: 1s
+        retry-exceptions:
+          - java.net.ConnectException
+          - java.net.SocketTimeoutException
+
+# Performance tuning
+spring:
+  jmx:
+    enabled: false
+  main:
+    lazy-initialization: false 

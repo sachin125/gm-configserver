@@ -7,7 +7,7 @@ spring:
   main:
     banner-mode: off
   application:
-    name: GM-CONFIG-SERVICE
+    name: gm-config-service
   profiles:
     # active: native
     active: git
